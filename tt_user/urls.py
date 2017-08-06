@@ -4,10 +4,13 @@ import views
 urlpatterns = [
     url('^register/$', views.register),
     url('^register_handle/$', views.register_handle),
-    url('^check_user_name_(\w+)/$', views.check_user_name),
+    url(r'^check_user_name/$', views.check_user_name),
     url('^login/$', views.login),
-    url('^login_handle_(\w+)/$', views.login_handle_name),
-    url('^login_handle_(\w+)-(.+)/$', views.login_handle_pwd),
+    url(r'^login_handle-/$', views.login_handle_nv),
     url('^login_handle/$', views.login_handle),
-    url('^index/$', views.index),
+    url('^verify_code/$', views.verify_code),
+    url('^logout/$', views.logout),
+    url('^$', views.center),
+    url('^order/$', views.order),
+    url('^site/$', views.site),
 ]

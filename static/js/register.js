@@ -54,8 +54,8 @@ $(function(){
 
 		else
 		{
-			$.get('/user/check_user_name_' + $('#user_name').val() + '/', function (data) {
-				if(data.result == 'False'){
+			$.get('/user/check_user_name/', {'user_name':$('#user_name').val()}, function (data) {
+				if(data.result == 1){
 					$('#user_name').next().html('该用户名已注册')
 					$('#user_name').next().show();
 					error_name = true;
@@ -121,7 +121,7 @@ $(function(){
 	}
 
 
-	$('#reg_form').submit(function() {
+	$('.reg_form').submit(function() {
 		check_user_name();
 		check_pwd();
 		check_cpwd();

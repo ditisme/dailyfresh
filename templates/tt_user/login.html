@@ -3,12 +3,14 @@
 {% block head %}
 	<title>天天生鲜-登录</title>
     <script src="/static/js/login_handle.js/"></script>
-{% endblock head %}
 {#    <script>#}
-{#         if ( {{ uname }} == ){#}
-{#            $('.name_input').val('');#}
+{#        var res = {{ result }};#}
+{#        if ( res == 1){#}
+{#           $('#pwd_error').css('display','block');#}
 {#        }#}
 {#    </script>#}
+{% endblock head %}
+
 {% block body %}
 	<div class="login_top clearfix">
 		<a href="/user/index/" class="login_logo"><img src="/static/images/logo02.png"></a>
@@ -27,10 +29,19 @@
 					<form method="post" action="/user/login_handle/">
                         {% csrf_token %}
 						<input type="text" name="username" class="name_input" placeholder="请输入用户名" value="{{ uname }}">
-						<div class="user_error">输入错误</div>
+						<div class="user_error">该用户名不存在</div>
 						<input type="password" name="pwd" class="pass_input" placeholder="请输入密码">
-						<div class="pwd_error">输入错误</div>
-						<div class="more_input clearfix">
+{#                         <div class="pwd_error" id="pwd_error">密码输入错误</div>#}
+                        {% if result == 1 %}
+                            <div class="pwd_error">密码输入错误</div>
+                        {% endif %}
+
+                        <input type="text" name="yzm" class="verify_input">
+                        <img src="/user/verify_code/?1" alt="" class="verify_img">
+                        <span id="change">看不清，换一个</span>
+                        <div class="verify_error">验证码输入错误</div>
+
+                        <div class="more_input">
 							<input type="checkbox" name="check_input" value="y">
 							<label>记住用户名</label>
 							<a href="#">忘记密码</a>
