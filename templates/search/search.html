@@ -1,0 +1,58 @@
+{% extends 'tt_goods/base.html' %}
+
+{% block head %}
+    <title>全文检索--结果页</title>
+{% endblock head %}
+
+{% block breadcrumb %}
+
+<h1>搜索&nbsp;<b>{{query}}</b>&nbsp;结果如下：</h1>
+<div class="main_wrap clearfix">
+    <ul class="goods_type_list clearfix">
+    {% for goods in page_obj %}
+        <li>
+            <a href="/goods/detail/?gid={{ goods.object.id }}"><img src="/static/{{ goods.object.gpic }}"></a>
+            <h4><a href="/goods/detail/?gid={{ goods.object.id }}">{{ goods.object.gtitle }}</a></h4>
+            <div class="operate">
+                <span class="prize">￥{{ goods.object.gprice }}</span>
+                <span class="unit">{{ goods.object.gunit }}</span>
+                <a href="javascript:add_cart({{ goods.object.id }});" id="{{ goods.object.id }}" class="add_goods" title="加入购物车"></a>
+            </div>
+        </li>
+    {%empty%}
+        <li>啥也没找到</li>
+    {% endfor %}
+    </ul>
+
+    <div class="add_jump"></div>
+
+    <div class="pagenation">
+        {% if page_obj.number > 1 %}
+            <a href="/goods/search/?q={{ query }}&page={{ page_obj.previous_page_number }} " class="active">上一页</a>
+            <a href="/goods/search/?q={{ query }}&page=1" class="active">首页</a>
+        {% else %}
+            <a href="#" >上一页</a>
+            <a href="#" >首页</a>
+        {% endif %}
+
+    {% load filters %}
+
+        {% for item in page_obj|page_list %}
+            {% if item == page_obj.number %}
+                <a href="#" >{{ item }}</a>
+            {% else %}
+                <a href="/goods/search/?q={{ query }}&page={{ item }}"  class="active">{{ item }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.number < page_obj.paginator.num_pages %}
+            <a href="/goods/search/?q={{ query }}&page={{ page_obj.next_page_number }}" class="active">下一页</a>
+            <a href="/goods/search/?q={{ query }}&page={{ page_obj.paginator.num_pages }}" class="active">末页</a>
+        {% else %}
+            <a href="#" >下一页</a>
+            <a href="#" >末页</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock breadcrumb %}
+

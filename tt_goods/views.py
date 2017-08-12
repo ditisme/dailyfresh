@@ -1,3 +1,4 @@
+#coding=utf-8
 from django.shortcuts import render,redirect
 from django.http import JsonResponse
 from django.core.paginator import Paginator
@@ -46,7 +47,7 @@ def list(request):
         else:
             page_range = range(page.number-2, page.number+3)
 
-    context = {'cart':0, 'list_new':list_new,'page':page, 'page_range':page_range,'type_id':type_id,'order_by':order_by}
+    context = {'cart':1, 'list_new':list_new,'page':page, 'page_range':page_range,'type_id':type_id,'order_by':order_by}
     return render(request, 'tt_goods/list.html', context)
 
 def detail(request):
@@ -72,9 +73,20 @@ def detail(request):
     else:
         goods_list = [gid]
 
-    context = {'cart': 0, 'goods': goods, 'list_new': list_new}
+    context = {'cart': 1, 'goods': goods, 'list_new': list_new}
 
     response = render(request,'tt_goods/detail.html', context)
     response.set_cookie('goods_ids',','.join(goods_list) ,max_age=60*60*24*7)
 
     return response
+
+
+from haystack.generic_views import SearchView
+
+class MySearchView(SearchView):
+    def get_context_data(self, *args, **kwargs):
+        context = super(MySearchView, self).get_context_data(*args, **kwargs)
+        context['title']='搜索结果'
+        context['cart']='0'
+        context['isleft']='0'
+        return context

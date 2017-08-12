@@ -56,10 +56,10 @@
                     <span>|</span>
 
                     {% for click in item.list_click %}
-                        <a href="#" title="{{ click.gtitle }}">{{ click.gtitle|truncatechars:16 }}</a>
+                        <a href="/goods/detail/?gid={{ click.id }}" title="{{ click.gtitle }}">{{ click.gtitle|truncatechars:16 }}</a>
                     {% endfor %}
                 </div>
-                <a href="#" class="goods_more fr" id="fruit_more">查看更多 ></a>
+                <a href="/goods/list/?type={{ item.type.id }}" class="goods_more fr" id="fruit_more">查看更多 ></a>
             </div>
 
             <div class="goods_con clearfix">
@@ -67,8 +67,8 @@
                 <ul class="goods_list fl">
                     {% for new in item.list_new %}
                         <li>
-                            <h4><a href="#" title="{{ new.gtitle }}">{{ new.gtitle|truncatechars:16 }}</a></h4>
-                            <a href="#"><img src="/static/{{ new.gpic }}"></a>
+                            <h4><a href="/goods/detail/?gid={{ new.id }}" title="{{ new.gtitle }}">{{ new.gtitle|truncatechars:16 }}</a></h4>
+                            <a href="/goods/detail/?gid={{ new.id }}"><img src="/static/{{ new.gpic }}"></a>
                             <div class="prize">¥ {{ new.gprice }}</div>
                         </li>
                     {% endfor %}

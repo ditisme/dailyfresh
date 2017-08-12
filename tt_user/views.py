@@ -4,9 +4,11 @@ from django.http import JsonResponse,HttpResponse
 from hashlib import sha1
 from models import *
 from tt_goods.models import *
+from tt_order.models import *
 import random
 from PIL import Image,ImageDraw,ImageFont
 from user_decorators import user_login
+from django.core.paginator import Paginator
 # Create your views here.
 
 def register(request):
@@ -120,12 +122,16 @@ def login_handle(request):
     else:
         return render(request, 'tt_user/login.html', {'result':1, 'top':'0'})
 
+
+def islogin(request):
+    if request.session.has_key('uname'):
+        return JsonResponse({'islogin':1})
+    else:
+        return JsonResponse({'islogin':0})
+
 def logout(request):
     request.session.flush()
     return redirect('/user/login/')
-
-def index(request):
-    return render(request, 'tt_user/../templates/tt_goods/index.html')
 
 @user_login
 def center(request):
@@ -138,12 +144,24 @@ def center(request):
                 goods_list.append(GoodsInfo.objects.filter(pk=gid)[0])
 
         context = {'user':user, 'good_list':goods_list}
-        return render(request,'tt_user/user_center_info.html',context)
+        return render(request,'tt_user/info.html',context)
 
 @user_login
 def order(request):
-    context = {}
-    return render(request,'tt_user/user_center_order.html')
+    uname = request.session.get('uname')
+    user = UserInfo.objects.filter(uname=uname)[0]
+    order_list = OrderInfo.objects.filter(user=user).order_by('-odate')
+
+    pindex = int(request.GET.get('page','1'))
+    paginator = Paginator(order_list, 1)
+    if pindex <= 0:
+        pindex = 1
+    if pindex >= paginator.num_pages:
+        pindex = paginator.num_pages
+    page = paginator.page(pindex)
+
+    context = {'page':page}
+    return render(request,'tt_user/order.html', context)
 
 @user_login
 def site(request):
@@ -157,4 +175,4 @@ def site(request):
         uaddr.user_id = user.id
         uaddr.save()
     context = {'user':user}
-    return render(request,'tt_user/user_center_site.html', context)
+    return render(request,'tt_user/site.html', context)

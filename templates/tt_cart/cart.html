@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block head %}
+	<title>天天生鲜-购物车</title>
+
+    <script>
+
+    function total() {
+        var subtotal = 0;
+        var total = 0;
+        var count = 0;
+        $('.cart_list_td').each(function () {
+            var price = parseFloat($(this).children('.col05').children('span').text());
+            var num = parseInt($(this).children('.col06').find('.num_show').val());
+            var subtotal = price*num;
+            $(this).children('.col07').text(subtotal.toFixed(2)+'元');
+{#            单选框被选中，prop('checked')值为true#}
+            if ($(this).find(':checkbox').prop('checked')){
+                total += subtotal;
+                count++;
+{#                加上name属性用于提交订单#}
+                $(this).find(':checkbox').prop('name', 'cid');
+            }
+        })
+        $('.settlements').find('em').text(total.toFixed(2)).next().next().html(count);
+        $('.total_count em').text($(':checkbox:not(.check_all)').length);
+    }
+
+    function delcart(cid) {
+        if(confirm('确定删除？')){
+            $.get('/cart/delcart/',{'cart_id':cid}, function (data) {
+                if(data.isok == 1){
+                    $('#'+cid).remove();
+                    total();
+                }
+            })
+        }
+    }
+
+    $(function () {
+
+        total();
+        $('.check_all').click(function () {
+            $(':checkbox:not(.check_all)').prop('checked', $('.check_all').prop('checked'));
+            total();
+        })
+
+        $(':checkbox:not(.check_all)').click(function () {
+            total();
+            var checked_num = $(':checked:not(.check_all)').length;
+            var checkbox_num = $(':checkbox:not(.check_all)').length;
+            $('.check_all').prop('checked', checkbox_num == checked_num)
+        })
+
+        $('.num_show').blur(function () {
+            var num = parseInt($(this).val());
+            var kucun=parseInt($(this).parents('.col06').siblings('.col03').children('em').children('span').text());
+            if(isNaN(num) || num < 1){
+                num = 1;
+            }
+            else if(num > kucun ){
+                num = kucun;
+            }
+
+            var num_show = $(this);
+            num_show.val(num);
+
+            var cid = $(this).parents('.cart_list_td').attr('id');
+            $.get('/cart/set_num/', {'cart_id':cid,'num':num}, function (data) {
+                if(data.isok == 1){
+                  num_show.val(num);
+                  total();
+                }
+            })
+
+        })
+        $('.add').click(function(){
+            var num = parseInt($(this).next().val());
+            num++;
+            $(this).next().val(num).blur();
+        })
+        $('.minus').click(function(){
+            var num = parseInt($(this).prev().val());
+            num--;
+            $(this).prev().val(num).blur();
+        })
+    })
+    </script>
+
+{% endblock head %}
+
+{% block body %}
+	<div class="total_count">全部商品<em></em>件</div>
+	<ul class="cart_list_th clearfix">
+		<li class="col01">商品名称</li>
+		<li class="col02">商品单位</li>
+		<li class="col03">商品价格</li>
+		<li class="col04">数量</li>
+		<li class="col05">小计</li>
+		<li class="col06">操作</li>
+	</ul>
+
+    <form method="post" action="/order/">
+        {% csrf_token %}
+        {% for cart in cart_list %}
+
+        <ul class="cart_list_td clearfix" id="{{ cart.id }}">
+            <li class="col01"><input type="checkbox" name="" checked value="{{ cart.id }}"></li>
+            <li class="col02"><img src="/static/{{ cart.goods.gpic }}"></li>
+            <li class="col03">{{ cart.goods.gtitle}}<br><em>库存：<span>{{ cart.goods.gkucun }}</span></em></li>
+            <li class="col04">{{ cart.goods.gunit }}</li>
+            <li class="col05"><span>{{ cart.goods.gprice }}</span>元</li>
+            <li class="col06">
+                <div class="num_add">
+                    <a href="javascript:;" class="add fl">+</a>
+                    <input type="text" class="num_show fl" value="{{ cart.count }}">
+                    <a href="javascript:;" class="minus fl">-</a>
+                </div>
+            </li>
+            <li class="col07"> </li>
+            <li class="col08"><a href="javascript:delcart({{ cart.id }});">删除</a></li>
+        </ul>
+
+        {% endfor %}
+
+        <ul class="settlements">
+            <li class="col01"><input class="check_all" type="checkbox" name="" checked=""></li>
+            <li class="col02">全选</li>
+            <li class="col03">合计(不含运费)：<span>¥</span><em></em><br>共计<b></b>件商品</li>
+            <li class="col04"><input type="submit" value="去结算"></li>
+	    </ul>
+    </form>
+
+{% endblock body %}

@@ -5,6 +5,7 @@ class UrlMiddleware:
                                 '/user/register_handle/',
                                 '/user/check_user_name/',
                                 '/user/login/',
+                                '/user/islogin/',
                                 '/user/login_handle-/',
                                 '/user/login_handle/',
                                 '/user/verify_code/',
